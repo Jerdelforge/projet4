@@ -20,11 +20,11 @@ import derive as der
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille1","Achille2"] #Names of subjects
+subjects = ["Achille1","Achille2","Aurore1","Aurore2","Damien1","Damien2","Juliette1","Juliette2","Olivia1","Olivia2"] #Names of subjects
 ntrials = 6 #Number of trials for each subject
 
 # Double for-loop that runs thrgough all subjects and trials
-subject_number=2;
+subject_number=1;
 for s in subjects:
     for trial in range(1,ntrials+1): 
         # Set data path

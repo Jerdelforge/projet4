@@ -194,8 +194,8 @@ plt.xlabel('Normal Force [N]')
 plt.ylabel('Static Friction [-]')
 
 #%% Impression de la valeur des variables dans la console
-print("Index: the value of k is %f and n is %f" %(n_index,k_index))
-print("Thumb: the value of k is %f and n is %f" %(n_thumb,k_thumb))    
+print("Index: the value of k is %f and n is %f" %(k_index, n_index))
+print("Thumb: the value of k is %f and n is %f" %(k_thumb, n_thumb))    
     
     
     
