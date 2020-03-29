@@ -26,7 +26,11 @@ import get_mu_fit as gmf
 plt.close('all')
 
 # Chemins d'acces aux fichiers (A MODIFIER)
-filepaths=[".\gbio2\CF_data\Achille_CF_001.glm",".\gbio2\CF_data\Achille_CF_002.glm",".\gbio2\CF_data\Achille_CF_003.glm"]
+#filepaths=[".\gbio2\CF_data\Achille_CF_001.glm",".\gbio2\CF_data\Achille_CF_002.glm",".\gbio2\CF_data\Achille_CF_003.glm"]
+filepaths=[".\gbio2\CF_data\Aurore_CF_001.glm",".\gbio2\CF_data\Aurore_CF_002.glm",".\gbio2\CF_data\Aurore_CF_003.glm"]
+#filepaths=[".\gbio2\CF_data\Damien_CF_001.glm",".\gbio2\CF_data\Damien_CF_002.glm",".\gbio2\CF_data\Damien_CF_003.glm"]
+#filepaths=[".\gbio2\CF_data\Juliette_CF_001.glm",".\gbio2\CF_data\Juliette_CF_002.glm",".\gbio2\CF_data\Juliette_CF_003.glm"]
+#filepaths=[".\gbio2\CF_data\Olivia_CF_001.glm",".\gbio2\CF_data\Olivia_CF_002.glm",".\gbio2\CF_data\Olivia_CF_003.glm"]
 
 # Initialisation des structures servant à stocker les vakeurs de TF/NF et NF
 # aux moments des glissements
@@ -61,7 +65,7 @@ for filepath in filepaths:
     #Horizontal Tangential Force exerted by the index
     TFz_index  = glm_df.loc[:,'Fzgr']-np.nanmean(glm_df.loc[baseline,'Fzgr'])
     
-    #%%Compute COP manually
+    #%%Compute center of pression (COP) manually
     Fal = -np.array([glm_df.loc[:,'Fxal'],glm_df.loc[:,'Fyal'],glm_df.loc[:,'Fzal']])
     Far = -np.array([glm_df.loc[:,'Fxar'],glm_df.loc[:,'Fyar'],glm_df.loc[:,'Fzar']])
     Tal = -np.array([glm_df.loc[:,'Txal'],glm_df.loc[:,'Tyal'],glm_df.loc[:,'Tzal']])
@@ -86,6 +90,7 @@ for filepath in filepaths:
     gmp.get_mu_points(COPthumb_g,TFz_thumb,TFx_thumb,NF_thumb)
     
     all_mu_points_thumb=[*all_mu_points_thumb,*mu_thumb]
+    #print(mu_thumb)
     all_NF_thumb=[*all_NF_thumb,*NF_thumb[slip_indexes_thumb]]
     
     mu_index,slip_indexes_index,start_search_zones_index,end_search_zones_index = \
@@ -193,9 +198,30 @@ plt.title('Coefficient of friction thumb')
 plt.xlabel('Normal Force [N]')
 plt.ylabel('Static Friction [-]')
 
+
+#SM
+
+LFt = TFx_thumb+TFx_index
+cof_thumb = k_thumb*(x**(n_thumb-1))
+cof_index = k_index*(x**(n_index-1))
+
+GF_slip = LFt/(2*min(cof_thumb.any(),cof_index.any()))
+
+GF = (NF_thumb+NF_index)/2
+
+SM = GF-GF_slip
+
+x=np.arange(0,30,0.00125).tolist()
+fig = plt.figure(figsize = [15,7])
+plt.plot(x,SM)
+plt.xlim([0,30])
+plt.title('SM')
+plt.xlabel('Time [s]')
+plt.ylabel('SM [-]')
+
 #%% Impression de la valeur des variables dans la console
-print("Index: the value of k is %f and n is %f" %(k_index, n_index))
-print("Thumb: the value of k is %f and n is %f" %(k_thumb, n_thumb))    
+print("Index: the value of k is %f and n is %f" %(k_index,n_index))
+print("Thumb: the value of k is %f and n is %f" %(k_thumb,n_thumb))    
     
     
     
