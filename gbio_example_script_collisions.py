@@ -20,13 +20,16 @@ import derive as der
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Juliette2"] #Names of subjects
-ntrials = 6 #Number of trials for each subject
-
+subjects = ["Achille1"] #Names of subjects
+trials = [1,3,5] #Number of trials for each subject
 # Double for-loop that runs thrgough all subjects and trials
 subject_number=1;
+fig = plt.figure(figsize = [15,7])
+plt.axis([0, 40, -5, 50])
 for s in subjects:
-    for trial in range(1,ntrials+1): 
+    
+    #ax  = fig.subplots(1,1)
+    for trial in trials: 
         # Set data path
         glm_path = "gbio2\%s_%d_001.glm" % (s,trial)
         
@@ -83,9 +86,8 @@ for s in subjects:
         dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
         
         #%% Basic plot of the data
-        fig = plt.figure(figsize = [15,7])
-        ax  = fig.subplots(3,1)
         
+        """
         ax[0].plot(time, accX)
         ax[0].plot(time[ipk],accX[ipk], linestyle='', marker='o', 
                    markerfacecolor='None', markeredgecolor='r')
@@ -100,24 +102,32 @@ for s in subjects:
                                ax[0].get_ylim()[1]-ax[0].get_ylim()[0],color='k',alpha=0.3)
             ax[0].add_patch(rect0)
         
-        ax[1].plot(time,LF, label="LF")
-        ax[1].plot(time,GF, label="GF")
-        ax[1].legend(fontsize=12)
-        ax[1].set_xlabel("Time [s]", fontsize=13)
-        ax[1].set_ylabel("Forces [N]", fontsize=13)
-        ax[1].set_xlim([0,45])
+        plt.plot(time,LF, label="LF")
+        #plt.plot(time,GF, label="GF")
+        plt.legend(fontsize=12)
+        #plt.set_xlabel("Time [s]", fontsize=13)
+        #plt.set_ylabel("Forces [N]", fontsize=13)
+        #plt.set_xlim([0,45])
         
         ax[2].plot(time,dGF)
         ax[2].set_xlabel("Time [s]", fontsize=13)
         ax[2].set_ylabel("GF derivative [N/s]", fontsize=13)
         ax[2].set_xlim([0,45])
-    
+        """
+        rapport = GF/LF
+        
+        plt.plot(time,GF, label = trial)
+        plt.legend(fontsize=12)
+        #plt.set_xlabel("Time [s]", fontsize=13)
+        #plt.set_ylabel("GF/LF [-]", fontsize=13)
+        #plt.set_xlim([0,45])
+        
         #%% Save the figure as png file. Creates a folder "figures" first if it
         # doesn't exist
         if not os.path.exists('figures'):
             os.makedirs('figures')
         
-        fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial))
+        #fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial))
         
 
         
