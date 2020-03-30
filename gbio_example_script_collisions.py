@@ -16,16 +16,19 @@ import os
 
 import glm_data_processing as glm
 import derive as der
+import plot_graphes as plot
 
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille1"] #Names of subjects
-trials = [1,3,5] #Number of trials for each subject
+subjects = ["Achille1", "Achille2"] #Names of subjects
+trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
+
+
+
+rapporttab = np.zeros(shape=(len(trials)*len(subjects),28000))
+i=0
 # Double for-loop that runs thrgough all subjects and trials
-subject_number=1;
-fig = plt.figure(figsize = [15,7])
-plt.axis([0, 40, -5, 50])
 for s in subjects:
     
     #ax  = fig.subplots(1,1)
@@ -84,50 +87,22 @@ for s in subjects:
         #%% Compute derivative of LF
         dGF=der.derive(GF,800)
         dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
-        
+        rapporttab[i] = GF/LF
+        i=i+1
         #%% Basic plot of the data
         
-        """
-        ax[0].plot(time, accX)
-        ax[0].plot(time[ipk],accX[ipk], linestyle='', marker='o', 
-                   markerfacecolor='None', markeredgecolor='r')
-        ax[0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
-        ax[0].set_title("Simple example of GLM data", fontsize=14, fontweight="bold")
-        ax[0].set_xlim([0,45])
+        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
         
-        # Putting grey patches for cycles
-        for i in range(0,len(cycle_starts)):
-            rect0=plt.Rectangle((time[cycle_starts[i]],ax[0].get_ylim()[0]),\
-                               time[cycle_ends[i]-cycle_starts[i]],\
-                               ax[0].get_ylim()[1]-ax[0].get_ylim()[0],color='k',alpha=0.3)
-            ax[0].add_patch(rect0)
+        #plot.plot_segments(GF, LF, cycle_starts, cycle_ends)
         
-        plt.plot(time,LF, label="LF")
-        #plt.plot(time,GF, label="GF")
-        plt.legend(fontsize=12)
-        #plt.set_xlabel("Time [s]", fontsize=13)
-        #plt.set_ylabel("Forces [N]", fontsize=13)
-        #plt.set_xlim([0,45])
         
-        ax[2].plot(time,dGF)
-        ax[2].set_xlabel("Time [s]", fontsize=13)
-        ax[2].set_ylabel("GF derivative [N/s]", fontsize=13)
-        ax[2].set_xlim([0,45])
-        """
-        rapport = GF/LF
+#plot.plot_diff_samecond(time, rapporttab, len(trials))
         
-        plt.plot(time,GF, label = trial)
-        plt.legend(fontsize=12)
-        #plt.set_xlabel("Time [s]", fontsize=13)
-        #plt.set_ylabel("GF/LF [-]", fontsize=13)
-        #plt.set_xlim([0,45])
         
         #%% Save the figure as png file. Creates a folder "figures" first if it
         # doesn't exist
-        if not os.path.exists('figures'):
-            os.makedirs('figures')
-        
-        #fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial))
+        #if not os.path.exists('figures'):
+        #    os.makedirs('figures')
         
 
         
