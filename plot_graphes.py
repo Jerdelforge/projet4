@@ -46,13 +46,15 @@ def basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
 
 def plot_segments(GF, LF, cycle_starts, cycle_ends) :
     plt.figure(figsize = [15,7])
-    rapport = GF/LF
-    for i in range(0,len(cycle_starts)):
+    plt.axis([0,620, 0, 120])
+    #rapport = GF/LF
+    for i in range(0,len(cycle_starts)-1):
         if i<10 :
             col = "b"
         else :
             col = "r"
-        plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), rapport[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
+        #plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), rapport[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
+        plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), GF[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
         plt.legend(fontsize=12)
 
 
@@ -66,3 +68,16 @@ def plot_diff_samecond(time, rapport, n) :
         ax[i].plot(time,(rapport[n+i]-rapport[i]), color = col[i], label = lab)
         ax[i].plot(time,np.zeros(28000),"k")
         ax[i].legend(fontsize=12)
+        
+        
+def plot_diff_position(time, Acctab, GFtab, n) :
+    for i in range(0, n-1) : 
+        fig = plt.figure(figsize = [15,14])
+        ax = fig.subplots(2, 1)
+        ax[0].plot(time, GFtab[i], label = " GF tete en bas "+str(i+1))
+        ax[0].plot(time, GFtab[i+1], label = "GF tete en haut "+str(i+2))
+        ax[0].legend(fontsize=12)
+        ax[1].plot(time, Acctab[i], label = "Acc tete en bas "+str(i+1))
+        ax[1].plot(time, Acctab[i+1], label = "Acc tete en haut "+str(i+2))
+        ax[1].legend(fontsize=12)
+        i+=2

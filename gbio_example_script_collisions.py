@@ -21,12 +21,14 @@ import plot_graphes as plot
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille1", "Achille2"] #Names of subjects
+subjects = ["Achille1"] #Names of subjects
 trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
 
 
 
 rapporttab = np.zeros(shape=(len(trials)*len(subjects),28000))
+GFtab = np.zeros(shape=(len(trials)*len(subjects),28000))
+Acctab = np.zeros(shape=(len(trials)*len(subjects),28000))
 i=0
 # Double for-loop that runs thrgough all subjects and trials
 for s in subjects:
@@ -88,14 +90,16 @@ for s in subjects:
         dGF=der.derive(GF,800)
         dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
         rapporttab[i] = GF/LF
+        Acctab[trial-1] = accX
+        GFtab[trial-1] = GF
         i=i+1
         #%% Basic plot of the data
         
-        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
+        #plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
         
         #plot.plot_segments(GF, LF, cycle_starts, cycle_ends)
         
-        
+    #plot.plot_diff_position(time, Acctab, GFtab, trial)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
         
         
