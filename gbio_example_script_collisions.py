@@ -80,15 +80,20 @@ for s in subjects:
         LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
         LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
         
+        #%% Compute derivative of LF
+        dGF=der.derive(GF,800)
+        dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
+        
+        dLF=der.derive(LF,800)
+        dLF=glm.filter_signal(dLF,   fs = freqAcq, fc = 10)
+        
         #%% CUTTING THE TASK INTO SEGMENTS (your first task)
-        pk = signal.find_peaks(abs(accX),  prominence=9,distance=400)
+        pk = signal.find_peaks(dLF,  prominence=9,distance=700)
         ipk = pk[0]
         cycle_starts = ipk-400
         cycle_ends = ipk+200
         
-        #%% Compute derivative of LF
-        dGF=der.derive(GF,800)
-        dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
+        
         rapporttab[i] = GF/LF
         Acctab[trial-1] = accX
         GFtab[trial-1] = GF
@@ -99,7 +104,7 @@ for s in subjects:
         
         #plot.plot_segments(GF, LF, cycle_starts, cycle_ends)
         
-    #plot.plot_diff_position(time, Acctab, GFtab, trial)
+    plot.plot_diff_position(time, Acctab, GFtab, trial)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
         
         
