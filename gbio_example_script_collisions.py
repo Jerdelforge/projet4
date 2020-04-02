@@ -21,14 +21,15 @@ import plot_graphes as plot
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille1"] #Names of subjects
+subjects = ["Achille2"] #Names of subjects
 trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
 
 
-
-rapporttab = np.zeros(shape=(len(trials)*len(subjects),28000))
-GFtab = np.zeros(shape=(len(trials)*len(subjects),28000))
-Acctab = np.zeros(shape=(len(trials)*len(subjects),28000))
+longueur = 28000
+rapporttab = np.zeros(shape=(len(trials)*len(subjects),longueur))
+GFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
+LFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
+Acctab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 i=0
 # Double for-loop that runs thrgough all subjects and trials
 for s in subjects:
@@ -79,7 +80,14 @@ for s in subjects:
         LF   = glm.filter_signal(LF,   fs = freqAcq, fc = freqFiltForces)
         LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
         LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
-        
+        """
+        accX = accX[4799:-1]
+        GF = GF[4799:-1]
+        LF = LF[4799:-1]
+        LFv = LFv[4799:-1]
+        LFh = LFh[4799:-1]
+        time = time[4799:-1]
+        """
         #%% Compute derivative of LF
         dGF=der.derive(GF,800)
         dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
@@ -88,7 +96,7 @@ for s in subjects:
         dLF=glm.filter_signal(dLF,   fs = freqAcq, fc = 10)
         
         #%% CUTTING THE TASK INTO SEGMENTS (your first task)
-        pk = signal.find_peaks(dLF,  prominence=9,distance=700)
+        pk = signal.find_peaks(dLF,  prominence=125,distance=700)
         ipk = pk[0]
         cycle_starts = ipk-400
         cycle_ends = ipk+200
@@ -97,14 +105,16 @@ for s in subjects:
         rapporttab[i] = GF/LF
         Acctab[trial-1] = accX
         GFtab[trial-1] = GF
+        LFtab[trial-1] = LF
         i=i+1
         #%% Basic plot of the data
         
-        #plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
+        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
         
-        #plot.plot_segments(GF, LF, cycle_starts, cycle_ends)
+        #plot.plot_segments(GF, LF, accX, cycle_starts, cycle_ends, s, trial)
         
-    plot.plot_diff_position(time, Acctab, GFtab, trial)
+    #plot.plot_diff_position(time, Acctab, GFtab, LFtab, trial)
+    #plot.plot_diff_pos2(time, GFtab)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
         
         
