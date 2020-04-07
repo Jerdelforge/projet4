@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-plt.close('all')
 
 def basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial) :
     fig = plt.figure(figsize = [15,7])
@@ -18,7 +17,6 @@ def basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
     ax[0].plot(time[ipk],accX[ipk], linestyle='', marker='o', 
                   markerfacecolor='None', markeredgecolor='r')
     ax[0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
-    ax[0].set_title("Simple example of GLM data", fontsize=14, fontweight="bold")
     ax[0].set_xlim([0,45])
         
     # Putting grey patches for cycles
@@ -40,6 +38,18 @@ def basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
     ax[2].set_ylabel("GF derivative [N/s]", fontsize=13)
     ax[2].set_xlim([0,45])
     
+    if trial<=2 :
+        vue = "Bandeau"
+    elif trial <= 4 :
+        vue = "Lunettes"
+    else :
+        vue = "Normal"
+    if trial%2 :
+        tete = "Tête en bas"
+    else :
+        tete = "Tête en haut"
+    ax[0].set_title("%s, %s %s" %(s, vue, tete))
+    
     fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial))
     
     
@@ -49,18 +59,32 @@ def plot_segments(GF, LF, AccX, cycle_starts, cycle_ends, s, trial) :
     plt.axis([0,620, -50, 50])
     #rapport = GF/LF
     for i in range(0,len(cycle_starts)-1):
-        if i == 0 :
-            col = "g"
-        elif i%2 :
+        if i%2 == 0:
             col = "b"
+            lab = "Collision en haut"
         else :
             col = "r"
-        #plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), rapport[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
-        plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), GF[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
-        #plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), AccX[cycle_starts[i]:cycle_ends[i]],color = col, label = i)
-        plt.legend(fontsize=12)
+            lab = "Collision en bas"
+            
+        #plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), rapport[cycle_starts[i]:cycle_ends[i]],color = col, label = lab)
+        #plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), GF[cycle_starts[i]:cycle_ends[i]],color = col, label = lab)
+        plt.plot(range(0,cycle_ends[i]-cycle_starts[i]), AccX[cycle_starts[i]:cycle_ends[i]],color = col, label = lab)
+        plt.plot(np.full(80, 400), range(-40,40))
+        if i == 0 or i==1 :
+            plt.legend(fontsize=12)
+        if trial<=2 :
+            vue = "Bandeau"
+        elif trial <= 4 :
+            vue = "Lunettes"
+        else :
+            vue = "Normal"
+        if trial%2 :
+            tete = "Tête en bas"
+        else :
+            tete = "Tête en haut"
+        plt.title("%s, %s %s" %(s, vue, tete))
         
-        fig.savefig("figures\%s_%d_acc_segments.png" %(s,trial))
+        #fig.savefig("figures\%s_%d_GF_segments.png" %(s,trial))
 
 
 
@@ -69,7 +93,7 @@ def plot_diff_samecond(time, rapport, n) :
     ax = fig.subplots(n,1)
     col = ['b', 'r', 'g', 'c', 'm', 'y']
     for i in range(0,n):
-        lab = "condition " + str(i)
+        lab = "condition " + str(i+1)
         ax[i].plot(time,(rapport[n+i]-rapport[i]), color = col[i], label = lab)
         ax[i].plot(time,np.zeros(28000),"k")
         ax[i].legend(fontsize=12)
@@ -87,16 +111,17 @@ def plot_diff_position(time, Acctab, GFtab, n) :
         ax[1].legend(fontsize=12)
         i+=2
 """   
-def plot_diff_position(time, Acctab, GFtab, LFtab, n) :
-    fig = plt.figure(figsize = [15,21])
+def plot_diff_position(time, Acctab, GFtab, LFtab, rapporttab, n, s) :
+    fig = plt.figure(figsize = [15,30])
     axs = fig.subplots(9,1)
+    axs[0].axis([0, 35, -50, 50])
     for i in range(0, n) :
        
         if i%2 :
             lab = "tete en haut"
         else :
             lab = "tete en bas"
-        axs[int(i/2)].plot(time, GFtab[i], label = lab)
+        axs[int(i/2)].plot(time, rapporttab[i], label = lab)
         axs[(int(n/2)+int(i/2))].plot(time, Acctab[i], label = lab)
         axs[int(n) + int(i/2)].plot(time, LFtab[i], label = lab)
         axs[int(i/2)].legend(fontsize=12)
@@ -104,13 +129,13 @@ def plot_diff_position(time, Acctab, GFtab, LFtab, n) :
         axs[(int(n)+int(i/2))].legend(fontsize=12)
     axs[0].set_title('Bandeau')
     axs[1].set_title('Lunette')       
-    axs[2].set_title('Vision')
+    axs[2].set_title('Normal')
     axs[3].set_title('Bandeau')
     axs[4].set_title('Lunette')       
-    axs[5].set_title('Vision')
+    axs[5].set_title('Normal')
     axs[6].set_title('Bandeau')
     axs[7].set_title('Lunette')       
-    axs[8].set_title('Vision')
+    axs[8].set_title('Normal')
     axs[0].set_ylabel('GF')
     axs[1].set_ylabel('GF')
     axs[2].set_ylabel('GF')
@@ -120,6 +145,8 @@ def plot_diff_position(time, Acctab, GFtab, LFtab, n) :
     axs[6].set_ylabel('LF')
     axs[7].set_ylabel('LF')
     axs[8].set_ylabel('LF')
+    
+    #fig.savefig("figures\%s_GF_diffTeteHautBas.png" %(s))
     
     
 def plot_diff_pos2(time, GFtab) :

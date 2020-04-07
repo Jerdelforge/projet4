@@ -12,16 +12,16 @@ Created on Wed Jan 29 11:16:06 2020
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
-import os
 
 import glm_data_processing as glm
 import derive as der
 import plot_graphes as plot
+import FindPeaks as fp
 
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille2"] #Names of subjects
+subjects = ["Achille1"] #Names of subjects
 trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
 
 
@@ -30,6 +30,8 @@ rapporttab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 GFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 LFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 Acctab = np.zeros(shape=(len(trials)*len(subjects),longueur))
+GFipktab = np.zeros(shape=(len(trials)*len(subjects)))
+
 i=0
 # Double for-loop that runs thrgough all subjects and trials
 for s in subjects:
@@ -62,6 +64,7 @@ for s in subjects:
         
         #%% Get acceleration, LF and GF
         time  = glm_df.loc[:,'time'].to_numpy()
+        clock  = glm_df.loc[:,'Metronome_b0'].to_numpy()
         accX  = glm_df.loc[:,'LowAcc_X'].to_numpy()*(-9.81)
         accX  = accX-np.nanmean(accX[baseline])
         GF    = glm_df.loc[:,'GF'].to_numpy()
@@ -80,14 +83,7 @@ for s in subjects:
         LF   = glm.filter_signal(LF,   fs = freqAcq, fc = freqFiltForces)
         LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
         LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
-        """
-        accX = accX[4799:-1]
-        GF = GF[4799:-1]
-        LF = LF[4799:-1]
-        LFv = LFv[4799:-1]
-        LFh = LFh[4799:-1]
-        time = time[4799:-1]
-        """
+        
         #%% Compute derivative of LF
         dGF=der.derive(GF,800)
         dGF=glm.filter_signal(dGF,   fs = freqAcq, fc = 10)
@@ -95,25 +91,33 @@ for s in subjects:
         dLF=der.derive(LF,800)
         dLF=glm.filter_signal(dLF,   fs = freqAcq, fc = 10)
         
-        #%% CUTTING THE TASK INTO SEGMENTS (your first task)
-        pk = signal.find_peaks(dLF,  prominence=125,distance=700)
-        ipk = pk[0]
-        cycle_starts = ipk-400
-        cycle_ends = ipk+200
+        dAcc=der.derive(accX,800)
+        dAcc=glm.filter_signal(dAcc,   fs = freqAcq, fc = 10)
         
+        
+        #%% CUTTING THE TASK INTO SEGMENTS (your first task)
+        #ipk, cycle_starts, cycle_ends = fp.FindPeaks(accX)
+        #GF_ipk, GF_cs, GF_ce = fp.FindPeaks(GF)
+        ipk, cycle_starts, cycle_ends = fp.FindPeaks(dLF, accX)
+        #dAcc_ipk, dAcc_cs, dAcc_ce = fp.FindPeaks(dAcc)
+        #ipk, cycle_starts, cycle_ends = dLF_ipk, dLF_cs, dLF_ce
         
         rapporttab[i] = GF/LF
-        Acctab[trial-1] = accX
-        GFtab[trial-1] = GF
-        LFtab[trial-1] = LF
+        Acctab[len(trials)-1] = accX
+        GFtab[len(trials)-1] = GF
+        LFtab[len(trials)-1] = LF
+        
         i=i+1
         #%% Basic plot of the data
         
+        #plt.figure(figsize = [15,7])
+        #plt.plot(time, clock)
+        
         plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
         
-        #plot.plot_segments(GF, LF, accX, cycle_starts, cycle_ends, s, trial)
+        plot.plot_segments(GF, LF, accX, cycle_starts, cycle_ends, s, trial)
         
-    #plot.plot_diff_position(time, Acctab, GFtab, LFtab, trial)
+    #plot.plot_diff_position(time, Acctab, GFtab, LFtab, rapporttab, len(trials), s)
     #plot.plot_diff_pos2(time, GFtab)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
         
