@@ -84,7 +84,7 @@ def plot_segments(GF, LF, AccX, cycle_starts, cycle_ends, s, trial) :
             tete = "Tête en haut"
         plt.title("%s, %s %s" %(s, vue, tete))
         
-        #fig.savefig("figures\%s_%d_GF_segments.png" %(s,trial))
+        fig.savefig("figures\%s_%d_acc_segments.png" %(s,trial))
 
 
 

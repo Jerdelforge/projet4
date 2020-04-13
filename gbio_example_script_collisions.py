@@ -21,7 +21,7 @@ import FindPeaks as fp
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Achille1"] #Names of subjects
+subjects = ["Juliette1"] #Names of subjects
 trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
 
 
@@ -31,6 +31,8 @@ GFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 LFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 Acctab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 GFipktab = np.zeros(shape=(len(trials)*len(subjects)))
+
+GF2 = np.zeros(shape=(longueur))
 
 i=0
 # Double for-loop that runs thrgough all subjects and trials
@@ -83,6 +85,9 @@ for s in subjects:
         LF   = glm.filter_signal(LF,   fs = freqAcq, fc = freqFiltForces)
         LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
         LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
+        NF_thumb   = glm.filter_signal(NF_thumb,   fs = freqAcq, fc = freqFiltForces)
+        NF_index   = glm.filter_signal(NF_index,   fs = freqAcq, fc = freqFiltForces)
+        GF2 = (NF_thumb+NF_index)/2
         
         #%% Compute derivative of LF
         dGF=der.derive(GF,800)
@@ -101,11 +106,12 @@ for s in subjects:
         ipk, cycle_starts, cycle_ends = fp.FindPeaks(dLF, accX)
         #dAcc_ipk, dAcc_cs, dAcc_ce = fp.FindPeaks(dAcc)
         #ipk, cycle_starts, cycle_ends = dLF_ipk, dLF_cs, dLF_ce
+        #print(ipk)
         
-        rapporttab[i] = GF/LF
-        Acctab[len(trials)-1] = accX
-        GFtab[len(trials)-1] = GF
-        LFtab[len(trials)-1] = LF
+        #rapporttab[i] = GF/LF
+        #Acctab[i] = accX
+        #GFtab[i] = GF
+        #LFtab[i] = LF
         
         i=i+1
         #%% Basic plot of the data
@@ -113,14 +119,14 @@ for s in subjects:
         #plt.figure(figsize = [15,7])
         #plt.plot(time, clock)
         
-        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
-        
+        #plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, NF_index, dGF, s, trial)
+        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, NF_thumb, dGF, s, trial)
+
         plot.plot_segments(GF, LF, accX, cycle_starts, cycle_ends, s, trial)
         
     #plot.plot_diff_position(time, Acctab, GFtab, LFtab, rapporttab, len(trials), s)
     #plot.plot_diff_pos2(time, GFtab)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
-        
         
         #%% Save the figure as png file. Creates a folder "figures" first if it
         # doesn't exist

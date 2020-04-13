@@ -19,16 +19,19 @@ def FindPeaks(var, acc) :
             k = k+1
     ipk = np.delete(ipk, range(0, k))
     #print(ipk)
-    
-    rayon = 25
-    for i in range(len(ipk)) :
-        #print(str(ipk[i]) + " : " + str(acc[ipk[i]]))
-        #print(np.amax(np.abs(acc[(ipk[i]-rayon):(ipk[i]+rayon)])))
-        #print(np.where(np.abs(acc[(ipk[i]-rayon):(ipk[i]+rayon)]) == np.amax(np.abs(acc[(ipk[i]-rayon):(ipk[i]+rayon)]))))
-        ipk[i] = np.where(np.abs(acc[(ipk[i]):(ipk[i]+rayon)]) == np.amax(np.abs(acc[(ipk[i]):(ipk[i]+rayon)]))) +ipk[i]
-        #print(str(ipk[i]) + " : " + str(acc[ipk[i]]))
-        #print("---")
+    j=0
+    if acc[ipk[0]] < 0 :
+        j=1
         
+    
+    rayon = 30
+    for i in range(len(ipk)) :
+        if (i+j)%2 == 0 :
+            ipk[i] = np.where(acc[(ipk[i]-rayon):(ipk[i]+rayon)] == np.amax(acc[(ipk[i]-rayon):(ipk[i]+rayon)])) +ipk[i] -rayon
+        else :
+            ipk[i] = np.where(acc[(ipk[i]-rayon):(ipk[i]+rayon)] == np.amin(acc[(ipk[i]-rayon):(ipk[i]+rayon)])) +ipk[i] - rayon
+    
+    
     
     cycle_starts = ipk-400
     cycle_ends = ipk+200
