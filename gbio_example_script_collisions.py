@@ -21,8 +21,9 @@ import FindPeaks as fp
 # Fermeture des figures ouvertes
 plt.close('all')
 
-subjects = ["Juliette1"] #Names of subjects
+subjects = ["Aurore2"] #Names of subjects
 trials = [1, 2, 3, 4, 5, 6] #Trials for each subject
+
 
 
 longueur = 28000
@@ -30,11 +31,13 @@ rapporttab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 GFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 LFtab = np.zeros(shape=(len(trials)*len(subjects),longueur))
 Acctab = np.zeros(shape=(len(trials)*len(subjects),longueur))
-GFipktab = np.zeros(shape=(len(trials)*len(subjects)))
+ipktab = np.zeros(shape=(len(trials)*len(subjects),20),dtype=int)
+GFipktab = np.zeros(shape=(len(trials)*len(subjects),20))
 
 GF2 = np.zeros(shape=(longueur))
 
 i=0
+j=0
 # Double for-loop that runs thrgough all subjects and trials
 for s in subjects:
     
@@ -103,15 +106,23 @@ for s in subjects:
         #%% CUTTING THE TASK INTO SEGMENTS (your first task)
         #ipk, cycle_starts, cycle_ends = fp.FindPeaks(accX)
         #GF_ipk, GF_cs, GF_ce = fp.FindPeaks(GF)
-        ipk, cycle_starts, cycle_ends = fp.FindPeaks(dLF, accX)
+        ipk, cycle_starts, cycle_ends, inv = fp.FindPeaks(dLF, accX)
         #dAcc_ipk, dAcc_cs, dAcc_ce = fp.FindPeaks(dAcc)
         #ipk, cycle_starts, cycle_ends = dLF_ipk, dLF_cs, dLF_ce
         #print(ipk)
         
-        #rapporttab[i] = GF/LF
-        #Acctab[i] = accX
-        #GFtab[i] = GF
-        #LFtab[i] = LF
+        n=len(ipk)
+        if(n>20):
+            ipk=np.delete(ipk,-1)
+        if(n<20):
+            ipk=np.append(ipk,88888888)
+        ipktab[6*j+trial-1]=ipk
+        
+        rapporttab[i] = GF/LF
+        Acctab[i] = accX
+        GFtab[i] = GF
+        LFtab[i] = LF
+        
         
         i=i+1
         #%% Basic plot of the data
@@ -120,14 +131,37 @@ for s in subjects:
         #plt.plot(time, clock)
         
         #plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, NF_index, dGF, s, trial)
-        plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, NF_thumb, dGF, s, trial)
+        #plot.basic_plot(time, accX, ipk, cycle_starts, cycle_ends, LF, GF, dGF, s, trial)
 
-        plot.plot_segments(GF, LF, accX, cycle_starts, cycle_ends, s, trial)
+        #plot.plot_segments(NF_index, LF, accX, dAcc, cycle_starts, cycle_ends, s, trial, inv)
+        plot.plot_segmentsmeanCol(GF, LF, accX, dAcc, cycle_starts, cycle_ends, s, trial, inv)
         
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        i1 = 0
+        i2 = 0
+        
+        for k in range(len(ipk)) :
+            sum3 = sum3 + GF[ipk[k]]
+            if k%2 == 0 :
+                sum1 = sum1 + GF[ipk[k]]
+                i1+=1
+            else :
+                sum2 = sum2 + GF[ipk[k]]
+                i2+=1
+        mean = sum3/len(ipk)
+        mean1 = sum1/i1
+        mean2 = sum2/i2
+    j=j+1
+        #print("mean : " + str(mean))
+        #print("mean2 : " + str(mean2))
     #plot.plot_diff_position(time, Acctab, GFtab, LFtab, rapporttab, len(trials), s)
     #plot.plot_diff_pos2(time, GFtab)
 #plot.plot_diff_samecond(time, rapporttab, len(trials))
-        
+#plot.plot_segmentsmeanGF(GFtab/LFtab,trials,subjects,ipktab)
+#plot.plot_segmentsmeanGFHB(GFtab/LFtab,trial,subjects,ipktab)
+#plot.plot_segmentsmeanAllStar(GFtab,trials,subjects,ipktab)
         #%% Save the figure as png file. Creates a folder "figures" first if it
         # doesn't exist
         #if not os.path.exists('figures'):

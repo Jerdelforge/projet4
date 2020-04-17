@@ -19,6 +19,7 @@ def FindPeaks(var, acc) :
             k = k+1
     ipk = np.delete(ipk, range(0, k))
     #print(ipk)
+    
     j=0
     if acc[ipk[0]] < 0 :
         j=1
@@ -35,4 +36,4 @@ def FindPeaks(var, acc) :
     
     cycle_starts = ipk-400
     cycle_ends = ipk+200
-    return ipk, cycle_starts, cycle_ends
+    return ipk, cycle_starts, cycle_ends, j
